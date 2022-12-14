@@ -9,6 +9,13 @@ function outOfBoundaries(coord, boundaries){
   return x > maxX || x < minX || y > maxY || y < minY;
 }
 
+// Checks if the origin source is blocked
+function blockedSurface(coord, source) {
+  const [x, y] = coord;
+  const [x2, y2] = source;
+  return x === x2 && y === y2;
+}
+
 // Returns a resting point for the given coordinate 
 // or null if it's out of boundaries
 function cascade(coord, points, boundaries) {
@@ -27,8 +34,10 @@ function cascade(coord, points, boundaries) {
       restingPoint = newCoord;
       break;
     } 
-  }
+    
+    if(blockedSurface(coord, [500, 1])) return null;
 
+  }
   return restingPoint;
 }
 
@@ -50,6 +59,37 @@ function solveFirstChallenge() {
 
   return Object.values(sandPoints).length;
 }
+
+// Second Challenge Day 14
+function solveSecondhallenge() {
+  let sandPoints = {};
+  const { points, boundaries: b } = parseInput(file);
+  const { minY, minX, maxX, maxY } = b;
+
+  for(let i = -1000; i < 1000; i++) {
+    points[[minX + i, minY -2].toString()] = [minX + i, minY -2];
+  }
+  
+  const boundaries = { 
+    maxY: maxY + 1,
+    minY: minY - 2, 
+    minX: minX - 1000, 
+    maxX: maxX + 1000
+  };
+  
+  while(true) {
+    const source = [500, 1];
+    const newPoint = cascade(source, points, boundaries);
+    
+    if(!newPoint) break;
+    
+    points[newPoint.toString()] = newPoint;
+    sandPoints[newPoint.toString()] = newPoint;
+  }
+  
+  return Object.values(sandPoints).length;
+}
+
 
 // Parse the input
 function parseInput(input) {
@@ -98,3 +138,4 @@ function parseInput(input) {
 
 
 console.log(solveFirstChallenge()); // 1406
+console.log(solveSecondhallenge()); // 20870
